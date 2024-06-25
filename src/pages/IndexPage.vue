@@ -4,42 +4,56 @@
       <q-img class="main_bg" mode="cover" src="/src/assets/vader_bg.jpg">
       </q-img>
       <q-page class="column items-center justify-evenly">
-        <PlanetsTable></PlanetsTable>
+        <PlanetsTable :planets="planetsData" :isLoading="isLoadingData" />
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-// import { Todo, Meta } from 'components/models';
-import PlanetsTable from 'components/PlanetsTable.vue'
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useQuasar, } from 'quasar';
+import { api } from 'src/boot/axios';
+import PlanetsTable from 'components/PlanetsTable.vue';
+import { PlanetType } from 'src/types/PlanetType';
+const $q = useQuasar();
+const isLoadingData = ref(false);
+const planetsData = ref<PlanetType[]>([]);
 
-// const todos = ref<Todo[]>([
-//   {
-//     id: 1,
-//     content: 'ct1'
-//   },
-//   {
-//     id: 2,
-//     content: 'ct2'
-//   },
-//   {
-//     id: 3,
-//     content: 'ct3'
-//   },
-//   {
-//     id: 4,
-//     content: 'ct4'
-//   },
-//   {
-//     id: 5,
-//     content: 'ct5'
-//   }
-// ]);
-// const meta = ref<Meta>({
-//   totalCount: 1200
-// });
+onMounted(() => {
+  loadData();
+});
+
+function loadData() {
+  isLoadingData.value = true; // Set loading state to true
+  api.get('https://swapi.dev/api/planets')
+    .then((response) => {
+      const results = response.data.results;
+      planetsData.value = results.map((planet: PlanetType) => ({
+        name: planet.name,
+        population: planet.population,
+        rotation_period: planet.rotation_period,
+        climate: planet.climate,
+        gravity: planet.gravity,
+        created: planet.created,
+        url: planet.url
+      })) as PlanetType[];
+    })
+    .catch(() => {
+      $q.notify({
+        color: 'negative',
+        position: 'top',
+        message: 'Loading failed',
+        icon: 'report_problem'
+      });
+    })
+    .then(() => {
+      isLoadingData.value = false; // Set loading state to false after successful or failed API call
+    });
+}
+
+
+
 </script>
 <style scoped lang="scss">
 .main_bg {

@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-md">
-        <q-table :grid="$q.screen.xs" bordered title="Planets" :rows="rows" :columns="columns" row-key="name"
-            :filter="filter">
+        <q-table id="planetsTable" :grid="$q.screen.xs" bordered title="Planets" :rows="props.planets"
+            :columns="columns" row-key="name" :filter="filter">
             <template v-slot:top-right>
                 <q-input debounce="300" v-model="filter" placeholder="Search">
                     <template v-slot:append>
@@ -14,43 +14,52 @@
 </template>
 
 <script lang="ts" setup>
+import { PlanetType } from 'src/types/PlanetType';
 import { ref } from 'vue';
 const filter = ref('');
-interface Row {
-    name: string;
-    calories: number;
-    fat: number;
-    carbs: number;
-}
+const props = defineProps<{
+    planets: PlanetType[],
+    isLoading: boolean;
+}>();
+console.log(props.isLoading);
 
-const columns = [
+interface Column {
+    name: string;
+    required?: boolean;
+    label: string;
+    align?: 'left' | 'center' | 'right';
+    field: string | ((row: any) => any);
+    format?: (val: string) => string;
+    sortable?: boolean;
+}
+const columns: Column[] = [
     {
         name: 'name',
         required: true,
-        label: 'Dessert (100g serving)',
+        label: 'Name',
         align: 'left',
-        field: (row: Row) => row.name,
+        field: (row: PlanetType) => row.name,
         format: (val: string) => `${val}`,
         sortable: true
     },
-    { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-    { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-    { name: 'carbs', label: 'Carbs (g)', field: 'carbs' }
+    { name: 'population', align: 'center', label: 'Population', field: 'population', sortable: true },
+    { name: 'rotation_period', label: 'Rotation Pperiod', field: 'rotation_period', sortable: true },
+    { name: 'climate', label: 'Climate', field: 'climate', sortable: true },
+    { name: 'gravity', label: 'Gravity', field: 'gravity', sortable: true },
+    { name: 'created', label: 'Created', field: 'created', sortable: true },
+    { name: 'url', label: 'Url', field: 'url' }
 ]
 
-const rows: Row[] = [
-    { name: 'Frozen Yogurt', calories: 159, fat: 6.0, carbs: 24 },
-    { name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37 },
-    { name: 'Eclair', calories: 262, fat: 16.0, carbs: 23 },
-    { name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67 },
-    { name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49 },
-    { name: 'Jelly bean', calories: 375, fat: 0.0, carbs: 94 },
-    { name: 'Lollipop', calories: 392, fat: 0.2, carbs: 98 },
-    { name: 'Honeycomb', calories: 408, fat: 3.2, carbs: 87 },
-    { name: 'Donut', calories: 452, fat: 25.0, carbs: 51 },
-    { name: 'KitKat', calories: 518, fat: 26.0, carbs: 65 }
-]
+
 
 
 
 </script>
+<style scoped lang="scss">
+#planetsTable {
+    @media (min-width: 600px) {
+        min-width: 70dvw;
+        max-width: 70dvw;
+    }
+}
+</style>
