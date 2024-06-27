@@ -1,7 +1,7 @@
 <template>
-    <div class="q-pa-md">
+    <div class="q-pa-md full-width">
         <q-table id="planetsTable" :grid="$q.screen.xs" bordered title="Planets" :rows="planets" :columns="columns"
-            row-key="name" :filter="filter" :loading="isLoading" :sort-method="customSort" binary-state-sort>
+            row-key="name" :filter="filter" :loading="isLoading" binary-state-sort>
             <template v-slot:top-right>
                 <q-input debounce=" 300" v-model="filter" placeholder="Search">
                     <template v-slot:append>
@@ -27,14 +27,18 @@ import { PlanetType } from 'src/types/PlanetType';
 import { ref } from 'vue';
 import { date } from 'quasar';
 import { QTableProps } from 'quasar';
+
 defineProps<{
     planets: PlanetType[],
     isLoading: boolean;
 }>();
+
 const filter = ref('');
+
 const formatDate = (dateString: string) => {
     return date.formatDate(dateString, 'DD-MM-YYYY HH:mm:ss');
 };
+
 const columns: QTableProps['columns'] = [
     {
         name: 'name',
@@ -51,7 +55,7 @@ const columns: QTableProps['columns'] = [
         label: 'Population',
         field: 'population',
         sortable: true,
-        sort: (a: PlanetType, b: PlanetType) => a.populationNumber - b.populationNumber
+        sort: (_: string, _2: string, a: PlanetType, b: PlanetType) => a.populationNumber - b.populationNumber
     },
     {
         name: 'rotation_period',
@@ -65,7 +69,8 @@ const columns: QTableProps['columns'] = [
         align: 'left',
         label: 'Climate',
         field: 'climate',
-        sortable: true
+        sortable: true,
+        headerStyle: 'min-width: 250px; max-width: 300px'
     },
     {
         name: 'gravity',
@@ -73,7 +78,9 @@ const columns: QTableProps['columns'] = [
         label: 'Gravity',
         field: 'gravity',
         sortable: true,
-        sort: (a: PlanetType, b: PlanetType) => a.gravityNumber - b.gravityNumber
+        sort: (_: string, _2: string, a: PlanetType, b: PlanetType) => a.gravityNumber - b.gravityNumber,
+
+        headerStyle: 'min-width: 250px; max-width: 300px'
     },
     {
         name: 'created',
@@ -81,7 +88,8 @@ const columns: QTableProps['columns'] = [
         label: 'Created',
         field: 'created',
         sortable: true,
-        format: formatDate
+        format: formatDate,
+        sort: (a: string, b: string) => date.getDateDiff(a, b)
     },
     {
         name: 'url',
@@ -90,39 +98,23 @@ const columns: QTableProps['columns'] = [
         field: 'url'
     }
 ];
-function customSort(rows: any, sortBy: any, descending: any) {
-    const data = [...rows];
-    if (sortBy) {
-        data.sort((a, b) => {
-            const x = descending ? b : a;
-            const y = descending ? a : b;
 
-            if (sortBy === 'name' || sortBy === 'created' || sortBy === 'climate') {
-                // string sort
-                return x[sortBy] > y[sortBy] ? 1 : x[sortBy] < y[sortBy] ? -1 : 0;
-            } else {
-                // numeric sort
-                const xValue = parseFloat(x[sortBy]);
-                const yValue = parseFloat(y[sortBy]);
-
-                if (isNaN(xValue) && isNaN(yValue)) return 0;
-                if (isNaN(xValue)) return 1;
-                if (isNaN(yValue)) return -1;
-
-                return xValue - yValue;
-            }
-        });
-    }
-
-    return data;
-}
 
 </script>
-<style scoped lang="scss">
+<style lang="scss">
 #planetsTable {
-    @media (min-width: 600px) {
+    min-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+
+    @media (min-width: $breakpoint-md) {
         min-width: 70dvw;
         max-width: 70dvw;
+    }
+
+    @media (min-width: $breakpoint-lg) {
+        min-width: 1280px;
+        max-width: 1280px;
     }
 }
 </style>

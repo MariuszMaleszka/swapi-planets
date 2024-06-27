@@ -2,7 +2,7 @@
   <q-layout>
     <q-page-container>
       <q-img class="main_bg" mode="cover" src="/src/assets/vader_bg.jpg" />
-      <q-page class="column items-center justify-evenly">
+      <q-page class="column items-center planets-holder ">
         <PlanetsTable :planets="planetsData" :isLoading="isLoadingData" />
       </q-page>
     </q-page-container>
@@ -70,6 +70,14 @@ async function loadData() {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.808);
+  }
+}
+
+.planets-holder {
+  justify-content: flex-start;
+
+  @media (min-width: $breakpoint-sm) {
+    justify-content: center;
   }
 }
 </style>
