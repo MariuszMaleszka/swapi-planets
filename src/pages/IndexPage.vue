@@ -3,7 +3,8 @@
     <q-page-container>
       <q-img class="main_bg" mode="cover" src="/src/assets/vader_bg.jpg" />
       <q-page class="column items-center planets-holder ">
-        <PlanetsTable :planets="planetsData" :isLoading="isLoadingData" />
+        <PlanetsTable :planets="planetsData" :isLoading="isLoadingData" :pageNumber="pageNumber"
+          @update:pageNumber="onPageChanged" />
       </q-page>
     </q-page-container>
   </q-layout>
@@ -19,15 +20,20 @@ import { PlanetType } from 'src/types/PlanetType';
 const $q = useQuasar();
 const isLoadingData = ref(false);
 const planetsData = ref<PlanetType[]>([]);
+let pageNumber = ref<number>(1);
 
 onMounted(() => {
-  loadData();
+  loadData(pageNumber.value.toString());
 });
+function onPageChanged(newPage: number) {
+  pageNumber.value = newPage;
+  loadData(pageNumber.value.toString());
+}
 
-async function loadData() {
+async function loadData(pageNumber: string) {
   isLoadingData.value = true;
   try {
-    const response = await api.get('https://swapi.dev/api/planets');
+    const response = await api.get(`https://swapi.dev/api/planets/?page=${pageNumber}`);
     const results = response.data.results;
     // Populate 
     planetsData.value = results.map((planet: PlanetType) => ({
@@ -53,6 +59,8 @@ async function loadData() {
     isLoadingData.value = false;
   }
 }
+
+
 </script>
 
 <style scoped lang="scss">
